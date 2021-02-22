@@ -13,11 +13,11 @@ const int half_rotation = 96;
 
 // Define step constant
 #define FULLSTEP 4
-float accel = 75.0;       // acceleration
+float accel = 50.0;       // 75 por defecto acceleration
 float maxSpeed = 500.0;   // maximum speed to attain
-float cycle = 5000.0;     // number of steps required to ramp up to full speed
+float cycle = 5000.0;     // 5000 por defecto, number of steps required to ramp up to full speed
 int clockWise = 1;               // clockwise direction
-int counterClockWise = -1;       // counter-clockwise direction
+//int counterClockWise = -1;       // counter-clockwise direction
 // Creates an instance
 // Pins entered in sequence IN1-IN3-IN2-IN4 for proper step sequence
 AccelStepper stepper(FULLSTEP, IN1, IN3, IN2, IN4);
@@ -46,24 +46,25 @@ void apagado(){
  digitalWrite(IN2,LOW);
  digitalWrite(IN3,LOW);
  digitalWrite(IN4,LOW);
- delay(2000);
+ delay(5000);
   
 }
 
 void encendido()
 {
+   delay(1000);
   digitalWrite(IN1,HIGH);
  digitalWrite(IN2,HIGH);
  digitalWrite(IN3,HIGH);
  digitalWrite(IN4,HIGH);
- delay(2000);
+
 }
 void accelerateThenRun(float numSteps, float acceleration, float maximumSpeed, int clockDir)
 {
   stepper.moveTo(clockDir * numSteps);                                       //Set target steps and direction
   stepper.setMaxSpeed(maximumSpeed);
   stepper.setAcceleration(acceleration);
-
+  //speed : The most recently set speed. 
   while (clockDir * stepper.speed() < maximumSpeed)         //Run up to max speed or until key is pressed
   {
     stepper.run();
@@ -78,6 +79,13 @@ void accelerateThenRun(float numSteps, float acceleration, float maximumSpeed, i
       stepper.runSpeed(); //Run at max speed unless key pressed
     }*/
     stepper.stop();
+
+    while ( stepper.isRunning()  )//&& kpd.getKey() == NO_KEY )  //loop until motor stops or key is pressed
+    {
+      stepper.run();
+     }
+  
+    
     stepper.setCurrentPosition(0);                         //Reset position/speed to zero so we get acceleration on next start
   }   //end if
 }
